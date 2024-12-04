@@ -1,4 +1,4 @@
-data_path = './day4_data_test.txt'
+data_path = './day4_data.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -10,8 +10,7 @@ with open(data_path, 'r', encoding='utf-8') as file:
 #     border there shouldn't be a pattern going right)
 # 3 - record number and coordinates of all patterns
 
-# 1
-
+# 1 - traverse through grid
 grid = file_content.split('\n')
 
 height = 0 
@@ -29,20 +28,19 @@ print("grid is ", height, " by ", width)
 
 total = 0
 
-def check(int, direction):
-    if file_content[int] == direction:
+def coordinate_to_index(x,y):
+    return (y  * (width + 1)) + x 
+
+def check(x, y, direction):
+    index = coordinate_to_index(x,y)
+    if file_content[index] == direction:
         return True
     else:
         return False
 
-def coordinate_to_index(x,y):
-    return (y  * (width + 1)) + x 
-
 for y, line in enumerate(grid):
     for x, char in enumerate(line):
         if char == 'X':
-            #print(char, x, y, file_content[coordinate_to_index(x,y)])
-
             # 2 - we will first assume all directions are valid but rule certain ones out
             valid_directions = {
                 "N": True,
@@ -78,13 +76,64 @@ for y, line in enumerate(grid):
             # 3 - check if there are any matches
 
             if valid_directions['N'] == True:
-                print(x,y)
-                #6,4
-                if file_content[coordinate_to_index(x,y-1)] == 'M' and file_content[coordinate_to_index(x,y-2)] == 'A' and file_content[coordinate_to_index(x,y-3)] == 'S':
-                    print("N match found for ", x,y)
+                if check(x,y-1,'M') and check(x,y-2,'A') and check(x,y-3,'S'):
+                    #print("N match found for ", x,y)
+                    total += 1
+            if valid_directions['NE'] == True:
+                if check(x+1,y-1,'M') and check(x+2,y-2,'A') and check(x+3,y-3,'S'):
+                    #print("NE match found for ", x,y)
+                    total += 1
+            if valid_directions['E'] == True:
+                if check(x+1,y,'M') and check(x+2,y,'A') and check(x+3,y,'S'):
+                    #print("E match found for ", x,y)
+                    total += 1
+            if valid_directions['SE'] == True:
+                if check(x+1,y+1,'M') and check(x+2,y+2,'A') and check(x+3,y+3,'S'):
+                    #print("SE match found for ", x,y)
+                    total += 1
+            if valid_directions['S'] == True:
+                if check(x,y+1,'M') and check(x,y+2,'A') and check(x,y+3,'S'):
+                    #print("S match found for ", x,y)
+                    total += 1
+            if valid_directions['SW'] == True:
+                if check(x-1,y+1,'M') and check(x-2,y+2,'A') and check(x-3,y+3,'S'):
+                    #print("SW match found for ", x,y)
+                    total += 1
+            if valid_directions['W'] == True:
+                if check(x-1,y,'M') and check(x-2,y,'A') and check(x-3,y,'S'):
+                    #print("W match found for ", x,y)
+                    total += 1
+            if valid_directions['NW'] == True:
+                if check(x-1,y-1,'M') and check(x-2,y-2,'A') and check(x-3,y-3,'S'):
+                    #print("NW match found for ", x,y)
                     total += 1
 
 
+print("Part 1 Total = ", total)
+
+total2 = 0
+
+for y, line in enumerate(grid):
+    for x, char in enumerate(line):
+        if char == 'A':
+            # check start is valid
+            if (y > 0) and (x < width - 1) and (y < height - 1) and (x > 0):
+                # 3 - check if there are any matches
+                if check(x-1,y-1,'M') and check(x+1,y-1,'S') and check(x+1,y+1,'S') and check(x-1,y+1,'M'):
+                    #print(x,y)
+                    total2 += 1
+                if check(x-1,y-1,'M') and check(x+1,y-1,'M') and check(x+1,y+1,'S') and check(x-1,y+1,'S'):
+                    #print(x,y)
+                    total2 += 1
+                if check(x-1,y-1,'S') and check(x+1,y-1,'S') and check(x+1,y+1,'M') and check(x-1,y+1,'M'):
+                    #print(x,y)
+                    total2 += 1
+                if check(x-1,y-1,'S') and check(x+1,y-1,'M') and check(x+1,y+1,'M') and check(x-1,y+1,'S'):
+                    #print(x,y)
+                    total2 += 1
+            
+
+print("Part 2 Total = ", total2)
 
 
 
