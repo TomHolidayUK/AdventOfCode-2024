@@ -1,4 +1,4 @@
-data_path = './day5_data.txt'
+data_path = './day5_data_test.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -62,7 +62,6 @@ update_order = [[int(num) for num in line.split(',')] for line in update_order_c
 print(ordering_rules)
 print(update_order)
 
-
 # 2 - go through data 
 
 def find_relevant_rules(int):
@@ -70,6 +69,7 @@ def find_relevant_rules(int):
 
 total_updates = 0
 valid_updates = []
+invalid_updates = []
 
 for update in update_order:
     previous_values = []
@@ -81,8 +81,9 @@ for update in update_order:
         # check if there are any relevant_rules that contain a previous value
         for rule in relevant_rules:
             if rule[1] in previous_values:
-                # print("update invalid because of: ", num, " and ", rule)
+                #print("update invalid because of: ", num, " and ", rule)
                 valid = False
+                invalid_updates.append(update)
                 break
         previous_values.append(num)
     if valid:
@@ -102,4 +103,39 @@ for update in valid_updates:
     total += middle_value
 
 print("Part 1 Solution = ", total)
+
+total2 = 0
+
+# Part 2 plan 
+# go through invalid updates, if there is an invalid number, move it left and try again
+# when valid, find middle value
+
+def check_update(update_row):
+    previous_values = []
+    for index, num in enumerate(update_row):
+        relevant_rules = find_relevant_rules(num)
+        for rule in relevant_rules:
+            if rule[1] in previous_values:
+                return index
+        previous_values.append(num)
+    return -1
+
+final_updates = []
+
+for update in invalid_updates:
+    result = check_update(update)
+    while result > 0:
+        update[result], update[result - 1] = update[result - 1], update[result]
+        result = check_update(update)
+    final_updates.append(update)
+        
+for update in final_updates:
+    middle_index = (len(update) - 1) / 2
+    middle_value = update[int(middle_index)]
+    total2 += middle_value
+
+
+print("Part 2 Solution = ", total2)
+
+
         
