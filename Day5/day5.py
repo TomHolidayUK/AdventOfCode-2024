@@ -107,6 +107,8 @@ print("Part 1 Solution = ", total)
 total2 = 0
 
 # Part 2 plan 
+
+
 # go through invalid updates, if there is an invalid number, move it left and try again
 # when valid, find middle value
 
