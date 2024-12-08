@@ -59,9 +59,6 @@ visited_squares = set() # set used because it will only accept unique value (we 
 
 while not at_edge:
 
-    # print("current location = ", current_location)
-    # print("current direction = ", current_direction)
-
     # add current location to set, the set won't allow duplicates
     visited_squares.add(coordinate_to_index(current_location[0], current_location[1]))
 
@@ -84,7 +81,6 @@ while not at_edge:
 
     # if we reach the edge, we have finished so exit the loop
     if (next_location[0] == 0) or (next_location[1] == 0) or (next_location[0] == width - 1) or (int(next_location[1]) == int(height - 1)):
-        print("Reached the edge at ", next_location)
         visited_squares.add(coordinate_to_index(next_location[0], next_location[1]))
         at_edge = True
     else:
@@ -98,21 +94,15 @@ print("Part 1 Solution = ", len(visited_squares))
 # 2 - test if we go into an infinite loop here 
 #     (we can test if we go into an infinte loop by seeing if we end up in a position and direction that we've had before)
 
+
 part2_total = 0 
 total_length = len(file_content)
 directions = ["N", "E", "S", "W"]
 
-for x in range(len(file_content)):
-    # loop through all "." and create a new grid to test with 
-    file_content_copy = file_content[:]
-    if file_content[x] == ".":
-        file_content_copy = file_content_copy[:x] + "#" + file_content_copy[x + 1:]
-    else:
-        continue
+for position in visited_squares:
 
-    # print(file_content_copy)
-    # print("***********")
-    print("Progress = ", x, "/", total_length, "[", (x/total_length * 100), "%]")
+    file_content_copy = file_content[:]
+    file_content_copy = file_content_copy[:position] + "#" + file_content_copy[position + 1:]
 
     grid = file_content_copy.split('\n')
 
@@ -131,9 +121,6 @@ for x in range(len(file_content)):
 
     while should_continue:
 
-        # print("current location = ", current_location)
-        # print("current direction = ", current_direction)
-
         # add current location and direction to record
         location_and_direction_record.add((coordinate_to_index(current_location[0], current_location[1]), current_direction))
 
@@ -143,30 +130,21 @@ for x in range(len(file_content)):
         # if next position is a '#', then change direction clockwise
         if next_location_value_part2(next_location) == "#":
             current_direction = directions[(directions.index(current_direction) + 1) % 4]
-            # if current_direction == "N":
-            #     current_direction = "E"
-            # elif current_direction == "E":
-            #     current_direction = "S"
-            # elif current_direction == "S":
-            #     current_direction = "W"
-            # elif current_direction == "W":
-            #     current_direction = "N"
+            # check that next position isn't a '#' again so we have to turn again
+            next_location = calculate_next_location(current_location, current_direction)
+            if next_location_value_part2(next_location) == "#":
+                current_direction = directions[(directions.index(current_direction) + 1) % 4]
 
             # if we hit a # we need to re-calculate a different next location
             next_location = calculate_next_location(current_location, current_direction)
 
         # if we reach the edge, we have finished so exit the loop
         if (int(next_location[0]) <= 0) or (int(next_location[1]) <= 0) or (int(next_location[0]) >= int(width - 1)) or (int(next_location[1]) >= int(height - 1)):
-            #print("Reached the edge at ", next_location)
             should_continue = False
             break
         elif (coordinate_to_index(next_location[0], next_location[1]), current_direction) in location_and_direction_record:
             # if we have been in the current position with the same directions before
             part2_total += 1
-            print("Total Increase = ", part2_total)
-            #print("Progress = ", x, "/", total_length, "[", (x/total_length * 100), "%]")
-            # print(file_content_copy)
-            # print("***********")
             should_continue = False
             break
         else:   
@@ -174,5 +152,3 @@ for x in range(len(file_content)):
 
 
 print("Part 2 Solution = ", part2_total)
-
-# 1920 - too high 
