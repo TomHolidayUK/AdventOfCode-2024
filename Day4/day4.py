@@ -77,35 +77,27 @@ for y, line in enumerate(grid):
 
             if valid_directions['N'] == True:
                 if check(x,y-1,'M') and check(x,y-2,'A') and check(x,y-3,'S'):
-                    #print("N match found for ", x,y)
                     total += 1
             if valid_directions['NE'] == True:
                 if check(x+1,y-1,'M') and check(x+2,y-2,'A') and check(x+3,y-3,'S'):
-                    #print("NE match found for ", x,y)
                     total += 1
             if valid_directions['E'] == True:
                 if check(x+1,y,'M') and check(x+2,y,'A') and check(x+3,y,'S'):
-                    #print("E match found for ", x,y)
                     total += 1
             if valid_directions['SE'] == True:
                 if check(x+1,y+1,'M') and check(x+2,y+2,'A') and check(x+3,y+3,'S'):
-                    #print("SE match found for ", x,y)
                     total += 1
             if valid_directions['S'] == True:
                 if check(x,y+1,'M') and check(x,y+2,'A') and check(x,y+3,'S'):
-                    #print("S match found for ", x,y)
                     total += 1
             if valid_directions['SW'] == True:
                 if check(x-1,y+1,'M') and check(x-2,y+2,'A') and check(x-3,y+3,'S'):
-                    #print("SW match found for ", x,y)
                     total += 1
             if valid_directions['W'] == True:
                 if check(x-1,y,'M') and check(x-2,y,'A') and check(x-3,y,'S'):
-                    #print("W match found for ", x,y)
                     total += 1
             if valid_directions['NW'] == True:
                 if check(x-1,y-1,'M') and check(x-2,y-2,'A') and check(x-3,y-3,'S'):
-                    #print("NW match found for ", x,y)
                     total += 1
 
 
@@ -120,16 +112,12 @@ for y, line in enumerate(grid):
             if (y > 0) and (x < width - 1) and (y < height - 1) and (x > 0):
                 # 3 - check if there are any matches
                 if check(x-1,y-1,'M') and check(x+1,y-1,'S') and check(x+1,y+1,'S') and check(x-1,y+1,'M'):
-                    #print(x,y)
                     total2 += 1
                 if check(x-1,y-1,'M') and check(x+1,y-1,'M') and check(x+1,y+1,'S') and check(x-1,y+1,'S'):
-                    #print(x,y)
                     total2 += 1
                 if check(x-1,y-1,'S') and check(x+1,y-1,'S') and check(x+1,y+1,'M') and check(x-1,y+1,'M'):
-                    #print(x,y)
                     total2 += 1
                 if check(x-1,y-1,'S') and check(x+1,y-1,'M') and check(x+1,y+1,'M') and check(x-1,y+1,'S'):
-                    #print(x,y)
                     total2 += 1
             
 
