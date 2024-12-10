@@ -82,6 +82,7 @@ p2 = len(disk_list_copy) - 1
 
 def find_required_space(list, size, block_start):
     count = 0
+    # iterate throgh the whole pattern, but only up to the point of the current block as spaces after are invalid
     for i in range(block_start):
         if list[i] == ".":
             count += 1
@@ -92,17 +93,15 @@ def find_required_space(list, size, block_start):
             return i - size + 1  
     return -1
 
-# print(find_required_space(disk_list_copy, 2))
 
 print(disk_list_copy)
 
 while p2 >= 0:
-    #print("------")
+    # if space, continue. We are only interested in blocks 
     if disk_list_copy[p2] == ".":
         p2 -= 1
         continue
 
-    #print(p2, disk_list_copy[p2])
     # find block of this value
     value = disk_list_copy[p2]
     p3 = p2
@@ -110,34 +109,32 @@ while p2 >= 0:
         p3 -= 1
     block_size = p2 - p3
 
+    # p3 = pointer to the first position before the start of the blocl
+
     # so now we need to find the first available space for a block of size block_size
     # this space also needs to be to the left of the block (p3)
     space_index = find_required_space(disk_list_copy, block_size, p3 + 1)
     if space_index == -1:
-        #print("no space found")
         p2 -= block_size
         continue
 
     # now we have the space we need to do the move
-    #print("space found at ", space_index)
     for space in range(space_index, space_index + block_size):
         disk_list_copy[space] = value
 
     # if block was at the end of the list, delete it 
     if p2 == len(disk_list_copy) - 1:
-        #print("removing block from end")
         disk_list_copy = disk_list_copy[:-block_size]
-        p2 -= (block_size - 1)
+        p2 -= block_size
+        continue
     else:
-        # if it is in the middle, replace with spaces
-        #print("in middle, replacing with spaces")
-        for index in range(p2, p3, -1):
+        # if it is not at the end, replace with spaces
+        for index in range(p3 + 1, p2 + 1):
             disk_list_copy[index] = "."
-        p2 -= 1
+        p2 -= block_size
+        continue
 
-    #print(disk_list_copy)
-    p2 -= 1
-
+print(disk_list_copy)
 
 part_2_total = 0 
 
@@ -146,5 +143,3 @@ for i, num in enumerate(disk_list_copy):
         part_2_total += i * int(num)
 
 print("Part 2 Answer = ", part_2_total)
-
-# 6421738978405 - too high
