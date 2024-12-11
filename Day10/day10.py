@@ -38,17 +38,18 @@ rows, cols = len(grid), len(grid[0])
 
 def dfs(grid, y, x, visited):
         global trailhead_total
+        global trailhead_total2
         current_value = grid[y][x]
-        print("current position = ", y, x , current_value)
         
-        # If we reach end of trail and we haven't already been there, add to total
         if grid[y][x] == 9:
-            print("trailhead complete!!!")
-            trailhead_total += 1
-            end_positions.append([[y],[x]])
-            visited = [[False] * cols for _ in range(rows)]
-            print("backtrack and pop")
-            return
+            # If we reach end of trail and we haven't already been there, add to part 1 total
+            if [[y],[x]] not in end_positions:
+                trailhead_total += 1
+                end_positions.append([[y],[x]])
+            
+            # if we get to the end of the trail any way, add to part 2 total which accounts for all possible paths
+            trailhead_total2 += 1
+            #return
         
         directions = [(1, 0), (-1, 0), (0, 1), (0, -1)] # Possible moves
         
@@ -56,20 +57,20 @@ def dfs(grid, y, x, visited):
             new_y, new_x = y + dy, x + dx
 
             if 0 <= new_y < rows and 0 <= new_x < cols and not visited[new_y][new_x] and grid[new_y][new_x] == current_value + 1:
-                print("possible new position = ", new_y, new_x, grid[new_y][new_x])
                 visited[new_y][new_x] = True
                 
                 # Recurse to continue exploring
                 dfs(grid, new_y, new_x, visited)
 
-                print("TEST - ", new_y, new_x)
                 visited[new_y][new_x] = False
 
 total = 0
+total2 = 0
 
 for trailhead in trailheads:
 
     trailhead_total = 0
+    trailhead_total2 = 0
     end_positions = []
 
     visited = [[False] * cols for _ in range(rows)]  # 2D array to track visited cells
@@ -77,10 +78,11 @@ for trailhead in trailheads:
     dfs(grid, trailhead[0], trailhead[1], visited)
     print(trailhead_total)
     total += trailhead_total
+    total2 += trailhead_total2
 
 
 print("Part 1 Answer = ", total)
-
+print("Part 2 Answer = ", total2)
 
 # Part 2 Plan
 
