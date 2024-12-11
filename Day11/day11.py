@@ -16,8 +16,9 @@ data = file_content
 # 3 - apply the function recursively 25 times
 
 stones = [int(item) for item in data.split(" ")]
+stones_copy = stones.copy()
 
-print(stones)
+# print(stones)
 
 def split(stone):
     stone_string = str(stone)
@@ -41,8 +42,28 @@ def blink(stones):
             new_stones.append(stone * 2024)
     return new_stones
 
-# print(blink(stones))
-
 for i in range(25):
     stones = blink(stones)
-    print(stones)
+
+print("Part 1 Result = ", len(stones))
+
+# Part 2 
+# We only need to find the length, we don't need to calculate the stones, this is wasted calculation
+# Do we use memoisation???
+
+from functools import cache
+
+@cache 
+def count(stone, steps):
+    if steps == 0:
+        return 1
+    if stone == 0:
+        return count(1, steps - 1)
+    string = str(stone)
+    length = len(string)
+    if length % 2 == 0:
+        return count(int(string[: length // 2]), steps - 1) + count(int(string[length // 2:]), steps - 1)
+    return count(stone * 2024, steps - 1)
+
+
+print("Part 2 Result = ", sum(count(stone, 75) for stone in stones_copy))
