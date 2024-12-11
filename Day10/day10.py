@@ -47,9 +47,9 @@ def dfs(grid, y, x, visited):
                 trailhead_total += 1
                 end_positions.append([[y],[x]])
             
-            # if we get to the end of the trail any way, add to part 2 total which accounts for all possible paths
+            # If we get to the end of the trail any way, add to part 2 total which accounts for all possible paths
             trailhead_total2 += 1
-            #return
+
         
         directions = [(1, 0), (-1, 0), (0, 1), (0, -1)] # Possible moves
         
@@ -62,6 +62,8 @@ def dfs(grid, y, x, visited):
                 # Recurse to continue exploring
                 dfs(grid, new_y, new_x, visited)
 
+                # after exploring all possible paths from current cell mark as not visited so it can be included in other paths
+                # this essentially allows backtracking
                 visited[new_y][new_x] = False
 
 total = 0
