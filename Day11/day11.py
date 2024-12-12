@@ -48,22 +48,30 @@ for i in range(25):
 print("Part 1 Result = ", len(stones))
 
 # Part 2 
-# We only need to find the length, we don't need to calculate the stones, this is wasted calculation
-# Do we use memoisation???
+# we need to use recursion with memoisation
+# we use recursion to keep going deeper down the "paths" of the the stones
+# we use memoisation to store previous calculations to avoid uneccessary repetion (below we use functool's cache to do this)
+# this recursion behaves similar in a way to a DFS as it goes as deep as it can (to the bottom) before backtracking and completing
+# other calls on the stack
+
 
 from functools import cache
 
 @cache 
 def count(stone, steps):
-    if steps == 0:
+    print(stone, steps)
+    if steps == 75:
+        # we have found a stone at the bottom level, so add 1 to the total
         return 1
     if stone == 0:
-        return count(1, steps - 1)
+        return count(1, steps + 1)
     string = str(stone)
     length = len(string)
     if length % 2 == 0:
-        return count(int(string[: length // 2]), steps - 1) + count(int(string[length // 2:]), steps - 1)
-    return count(stone * 2024, steps - 1)
+        # if number is even we need to recursivley call count twice, this creates and exponentially increasing 
+        # calculation so it is important to use memoisation alongside
+        return count(int(string[:length // 2]), steps + 1) + count(int(string[length // 2:]), steps + 1)
+    return count(stone * 2024, steps + 1)
 
 
-print("Part 2 Result = ", sum(count(stone, 75) for stone in stones_copy))
+print("Part 2 Result = ", sum(count(stone, 0) for stone in stones_copy))
