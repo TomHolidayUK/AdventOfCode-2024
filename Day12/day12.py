@@ -17,6 +17,42 @@ print(grid)
 
 rows, cols = len(grid), len(grid[0])
 
-# def find_group(x, y):
-#     # implement DFS
-# copy day 10 
+# create dictionary to contain sets of the different groups
+groups = {}
+in_group = set()
+
+def find_grid(y, x, visited):
+        
+        #print("current pos: ", x, y)
+
+        groups[grid[y][x]].add((y,x))
+        in_group.add((y,x))
+              
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)] # Possible moves
+        
+        for dy, dx in directions:
+            new_y, new_x = y + dy, x + dx
+
+            if 0 <= new_y < rows and 0 <= new_x < cols and not visited[new_y][new_x] and grid[new_y][new_x] == grid[y][x]:
+                visited[new_y][new_x] = True
+                
+                # Recurse to continue exploring
+                find_grid(new_y, new_x, visited)
+
+                # after exploring all possible paths from current cell mark as not visited so it can be included in other paths
+                # this essentially allows backtracking
+                visited[new_y][new_x] = False
+
+
+visited = [[False] * cols for _ in range(rows)]  # 2D array to track visited cells
+visited[0][0] = True
+value = grid[0][0]
+
+for y, line in enumerate(grid):
+    for x, char in enumerate(line):
+        if (y,x) not in in_group:
+            print("searching for ", y, x)
+            value = grid[y][x]
+            groups[value] = set()
+            find_grid(y, x, visited)
+            print(groups)
