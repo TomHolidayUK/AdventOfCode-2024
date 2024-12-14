@@ -1,4 +1,4 @@
-data_path = './day12_data_test.txt'
+data_path = './day12_data.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -18,9 +18,10 @@ rows, cols = len(grid), len(grid[0])
 
 # create dictionary to contain sets of the different groups
 groups = {}
+groups_list = []
 in_group = set()
 
-def find_group(y, x, visited):
+def find_group(y, x, visited, group_number):
         
         #print("current pos: ", x, y)
 
@@ -29,6 +30,7 @@ def find_group(y, x, visited):
             return
 
         groups[grid[y][x]].add((y,x))
+        groups_list[group_number][1].append([y, x])
         in_group.add((y,x))
               
         directions = [(1, 0), (-1, 0), (0, 1), (0, -1)] 
@@ -40,7 +42,7 @@ def find_group(y, x, visited):
                 visited[new_y][new_x] = True
                 
                 # Recurse to continue exploring
-                find_group(new_y, new_x, visited)
+                find_group(new_y, new_x, visited, group_number)
 
                 # after exploring all possible paths from current cell mark as not visited so it can be included in other paths
                 # this essentially allows backtracking
@@ -62,22 +64,19 @@ def perimeter(group_identifier):
                 perimeter += 1
     return perimeter
 
-def perimeter_trace(group_identifier, edges, start_y, start_x, start_direction):
+def perimeter_trace(group_number, edges, start_y, start_x, start_direction):
     # this traces a perimeter of a group counting the number of turns and addig to the edges list
-
-    trace = []
+    
+    trace = set()
     turns = 0
 
     current_y, current_x =  start_y, start_x
     current_direction = start_direction
 
-    while([current_y, current_x, current_direction] not in trace):
-        #print("current position: ", current_y, current_x)
-        #print("current direction: ", current_direction)
-
-        # add current pedge to edges
+    while((current_y, current_x, current_direction) not in trace):
+        # add current edge to edges
         edges.append([current_y, current_x, current_direction])
-        trace.append([current_y, current_x, current_direction])
+        trace.add((current_y, current_x, current_direction))
 
         # calculate next position and direction
         directions = [(-1, 0), (0, 1), (1, 0), (0, -1)] # N, E, S, W
@@ -86,8 +85,7 @@ def perimeter_trace(group_identifier, edges, start_y, start_x, start_direction):
         next_direction = (current_direction - 1) % 4
         dy, dx = directions[next_direction][0], directions[next_direction][1]
         next_y, next_x = current_y + dy, current_x + dx
-        if (next_y, next_x) in groups[group_identifier]:
-            #print("TURNING left")
+        if [next_y, next_x] in groups_list[group_number][1]:
             turns += 1
             current_y, current_x = next_y, next_x
             current_direction = next_direction
@@ -96,32 +94,45 @@ def perimeter_trace(group_identifier, edges, start_y, start_x, start_direction):
         # check if we need to turn
         dy, dx = directions[current_direction][0], directions[current_direction][1]
         next_y, next_x = current_y + dy, current_x + dx
-        if (next_y, next_x) in groups[group_identifier]:
-            #print("no need to turn")
+        if [next_y, next_x] in groups_list[group_number][1]:
             current_y, current_x = next_y, next_x
             continue
 
         # turn until current square in in same group
         turning = True
+        start_direction = current_direction
+
         while (turning == True):
-            #print("TURNING")
-            turns += 1
             current_direction = (current_direction + 1) % 4
+
+            if current_direction == start_direction:
+                # we have fully turned around, this must be a plot of area 1"
+
+                turns += 1
+                turning = False
+                continue
+
             dy, dx = directions[current_direction][0], directions[current_direction][1]
             next_y, next_x = current_y + dy, current_x + dx
+
+            if (current_y, current_x, current_direction) in trace:
+                # back at start, end
+                turns += 1
+                break
+
+            turns += 1
+
             edges.append([current_y, current_x, current_direction])
-            trace.append([current_y, current_x, current_direction])
-            if (next_y, next_x) in groups[group_identifier]:
-                #print("found a path")
+            trace.add((current_y, current_x, current_direction))
+            if [next_y, next_x] in groups_list[group_number][1]:
+                # found a path 
                 current_y, current_x = next_y, next_x
                 turning = False
-
-
-    print("Turns = ", turns)
+            
     return turns
 
 
-def sides(group_identifier):
+def sides(group_no):
 
     sides_total = 0
 
@@ -129,44 +140,41 @@ def sides(group_identifier):
 
     edges = []
 
-    for plot in groups[group_identifier]:
+    for plot in groups_list[group_no][1]:
         for i, direction in enumerate(directions):
             # we check for non group plots to the left of the direction of travel
             check_direction = (i - 1) % 4
             dy, dx = directions[check_direction][0], directions[check_direction][1]
             new_y, new_x = plot[0] + dy, plot[1] + dx
-            if (new_y, new_x) not in groups[group_identifier]:
+            if [new_y, new_x] not in groups_list[group_no][1]:
                 # found edge, now trace this perimeter all the way and count the number of changes in direction
                 if ([plot[0], plot[1], i] not in edges):
-                    print("found unique edge: ", new_y, new_x, i)
-                    sides_total += perimeter_trace(group_identifier, edges, plot[0], plot[1], i)
-                    print("sides_total = ", sides_total)
+                    sides_total += perimeter_trace(group_no, edges, plot[0], plot[1], i)
     
     return sides_total
 
 
 total = 0
+group_no = 0
 
 for y, line in enumerate(grid):
     for x, char in enumerate(line):
         if (y,x) not in in_group:
-            print("searching for ", y, x)
             value = grid[y][x]
             groups[value] = set()
-            find_group(y, x, visited)
-            #print(groups)
+            groups_list.append([value, []])
+            find_group(y, x, visited, group_no)
             total += len(groups[value]) * perimeter(value)
-            #print(total)
-
+            group_no += 1
 print("Part 1 Total = ", total)
 
-# THERE IS AN ISSUES FINDING THE NUMBER OF SIDES OF C
-print(sides("C"))
+total2 = 0
 
-# for group_identifier in groups:
-#     print(group_identifier)
-#     print(len(groups[group_identifier]))
-#     sides = sides(group_identifier)
+for group_no, group in enumerate(groups_list):
+    group_identifier, data = group[0], group[1]
+    number_of_sides = sides(group_no)
+    total2 += len(data) * number_of_sides
 
-# edges = []
-# perimeter_trace("R", edges, 0, 1, 1)
+
+print("Part 2 Total = ", total2)
+
