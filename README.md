@@ -6,3 +6,4 @@ Notes:
 Day 1 - 9 were fairly self explanatory and you could just use basic logic to solve. After this point for most days I had to research what algorithm or method had to be applied before applying myself
 Day 10 - DFS
 Day 11 - DFS with memoisation (dynamic programming)
+Day 12 - bit of DFS again (well connect the components algorithm to be more precise)

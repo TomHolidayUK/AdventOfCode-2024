@@ -22,6 +22,7 @@ row = [int(char) if char != '.' else '.' for char in line]
 # general form is sequence[start:stop:step]
 # we can use negative indexing to refer to values near the end of a list or string
 # -1 = the last element and so on
+lst = ""
 lst[:]	# Copy the entire list
 lst[2:]	# From index 2 to the end
 lst[:3]	# From the start to index 3 (excl.)
