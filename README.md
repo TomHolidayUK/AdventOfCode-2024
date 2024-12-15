@@ -7,3 +7,4 @@ Day 1 - 9 were fairly self explanatory and you could just use basic logic to sol
 Day 10 - DFS
 Day 11 - DFS with memoisation (dynamic programming)
 Day 12 - bit of DFS again (well connect the components algorithm to be more precise)
+Day 13 - basic linear equations

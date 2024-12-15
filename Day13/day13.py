@@ -69,5 +69,34 @@ for claw in all_data:
 
 print("Part 1 Answer = ", total_cost)
 
+# Part 2 plan
+# use linear algebra 
+
+part2_total = 0
+
+for claw in all_data:
+    buttonA = claw[0]
+    buttonB = claw[1]
+    target = claw[2]
+
+    x_possible = True
+    y_possible = True
+
+    ca = ((target[0] + 10000000000000) * buttonB[1] - (target[1] + 10000000000000) * buttonB[0]) / (buttonA[0] * buttonB[1] - buttonB[0] * buttonA[1])
+    cb = ((target[0] + 10000000000000) - buttonA[0] * ca) / buttonB[0]
+ 
+    print("ca - ", ca)
+    print("cb - ", cb)
+
+    if (ca % 1 == 0 and cb % 1 == 0):
+        print("claw is possible")
+        part2_total += int((3 * ca) + cb)
+    else:
+        print("claw isn't possible")
+
+    print("---------")
 
 
+print("Part 2 Answer = ", part2_total)
+
+# 875318608908 too low
