@@ -1,6 +1,6 @@
 import re
 
-data_path = './day14_data.txt'
+data_path = './day14_data_test.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -12,10 +12,10 @@ with open(data_path, 'r', encoding='utf-8') as file:
 # Work out which robot is in which quadrant
 
 rows = file_content.split('\n')
-# height = 7
-height = 103
-# width = 11
-width = 101
+height = 7
+# height = 103
+width = 11
+# width = 101
 
 # Record starting position of all robots
 robots = []
@@ -63,25 +63,40 @@ print(final_positions)
 # Work out which robot is in which quadrant
 q1, q2, q3, q4 = 0, 0, 0, 0
 for position in final_positions:
-    print(position)
     x, y = position[0], position[1]
-    print(int(width / 2 - 0.5))
-    print(int(height / 2 - 0.5))
-    print(int((width - 1)/ 2 + 0.5))
-    print(int(height / 2 + 0.5))
     if x < int((width / 2) - 0.5) and y < int(height / 2 - 0.5):
-        print("q1")
         q1 += 1
     if x >= int(width / 2 + 0.5) and y < int(height / 2 - 0.5):
-        print("q2")
         q2 += 1
     if x >= int(width / 2 + 0.5) and y >= int(height / 2 + 0.5):
-        print("q3")
         q3 += 1
     if x < int(width / 2 - 0.5) and y >= int(height / 2 + 0.5):
-        print("q4")
         q4 += 1
 
-print(q1, q2, q3, q4)
 
 print("Part 1 Total = ", q1 * q2 * q3 * q4)
+
+# Part 2 Plan
+# Look for patterns in the robots??? 
+# Try to find symmetry in the robots shape??? 
+# Or try to find them all next to each other???
+# We need to be able to print the robots shape to visualise them
+
+def print_positions(positions):
+    data_path = './day14_data.txt'
+    with open("./positions.txt", "w") as file:
+        # loop through all possible positions and see if there are robots there
+        for y in range(height):
+            for x in range(width):
+                num = positions.count([x,y])
+                if num > 0:
+                    file.write(f"{num}")
+                else:
+                    file.write(".")
+
+                if x == width - 1:
+                    file.write("\n")
+    
+    return "Printed positions to positions.txt"
+
+print(print_positions(final_positions))
