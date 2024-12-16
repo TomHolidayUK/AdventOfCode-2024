@@ -147,19 +147,14 @@ should_continue = True
 i = 0 
 while(should_continue == True):
     robot_positions = []
-    print(i)
     for robot in robots:
         robot[0], robot[1] = move(robot[0], robot[1], robot[2], robot[3])
         robot_positions.append([robot[0], robot[1]])
-    # if symmetry_check(robot_positions):
-    #     print(robot_positions)
-    #     print("STOPPING")
-    #     should_continue = False
 
-    # find longest row / column
-    if longest_chain(robot_positions) >= 7:
+    # symmetry didn't work, let's assume the christmas tree will have a long row or column of robots. so try to find a long chain of robots
+    if longest_chain(robot_positions) >= 9:
         should_continue = False
     i += 1
 
 print(print_positions(robot_positions))
-print(symmetry_check(robot_positions))
+print("Part 2 Solution = ", i + 1) # 8167
