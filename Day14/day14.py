@@ -1,6 +1,6 @@
 import re
 
-data_path = './day14_data_test.txt'
+data_path = './day14_data.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -12,10 +12,10 @@ with open(data_path, 'r', encoding='utf-8') as file:
 # Work out which robot is in which quadrant
 
 rows = file_content.split('\n')
-height = 7
-# height = 103
-width = 11
-# width = 101
+# height = 7
+height = 103
+# width = 11
+width = 101
 
 # Record starting position of all robots
 robots = []
@@ -28,28 +28,21 @@ for row in rows:
     robot.append(int(parts[2]))
     robots.append(robot)
 
-print(robots)
 
 # Write a move function that calculates a robots new coordinates after moving (including when they teleport)
 def move(start_x, start_y, vel_x, vel_y):
     new_x, new_y = start_x + vel_x, start_y + vel_y
     if new_x < 0:
-        #print("left")
         new_x += width
     if new_y < 0:
-        #print("top")
         new_y += height
     if new_x > width - 1:
-        #print("right")
         new_x -= width
     if new_y > height - 1:
-        #print("bottom")
         new_y -= height
 
     return new_x, new_y
 
-
-# print(move(5,1,2,-3))
 
 final_positions = []
 
@@ -60,7 +53,7 @@ for robot in robots:
         x, y = move(x, y, robot[2], robot[3])
     final_positions.append([x, y])
 
-print(final_positions)
+print(len(final_positions))
 
 # Work out which robot is in which quadrant
 q1, q2, q3, q4 = 0, 0, 0, 0
@@ -106,21 +99,19 @@ def print_positions(positions):
     
     return "Printed positions to positions.txt"
 
-print(print_positions(final_positions))
 
 def symmetry_check(positions):
     # find left and right robots
     left_robots, right_robots = [], []
     for position in positions:
         x, y = position[0], position[1]
-        if x < int((width / 2) - 0.5) and y < int(height / 2 - 0.5):
+        if x < int((width / 2) - 0.5):
             left_robots.append([x,y])
-        if x >= int(width / 2 + 0.5) and y < int(height / 2 - 0.5):
+        if x >= int(width / 2 + 0.5):
             right_robots.append([x,y])
-        if x >= int(width / 2 + 0.5) and y >= int(height / 2 + 0.5):
-            right_robots.append([x,y])
-        if x < int(width / 2 - 0.5) and y >= int(height / 2 + 0.5):
-            left_robots.append([x,y])
+
+    if len(left_robots) == 0:
+        return False
 
     # for every robot in quadrant 1 and 4 there needs to be a matching one in q2 or q3
     symmetrical = True
@@ -134,16 +125,41 @@ def symmetry_check(positions):
 
 print(symmetry_check(final_positions))
 
-robot_positions = []
+def longest_chain(positions):
+    longest_chain = 0
+    for position in positions:
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)] 
+        x, y = position[0], position[1]
+        for dx, dy in directions:
+            chain = 0 
+            x, y = x + dx, y + dy
+            while [x, y] in positions:
+                chain += 1
+                if chain > longest_chain:
+                    longest_chain = chain
+                x, y = x + dx, y + dy
+    return longest_chain
 
+
+
+robot_positions = []
 should_continue = True
+i = 0 
 while(should_continue == True):
+    robot_positions = []
+    print(i)
     for robot in robots:
-        print("check")
-        robot_positions = []
-        x, y = move(robot[0], robot[1], robot[2], robot[3])
-        robot_positions.append([x,y])
-        if symmetry_check(robot_positions):
-            should_continue = False
+        robot[0], robot[1] = move(robot[0], robot[1], robot[2], robot[3])
+        robot_positions.append([robot[0], robot[1]])
+    # if symmetry_check(robot_positions):
+    #     print(robot_positions)
+    #     print("STOPPING")
+    #     should_continue = False
+
+    # find longest row / column
+    if longest_chain(robot_positions) >= 7:
+        should_continue = False
+    i += 1
 
 print(print_positions(robot_positions))
+print(symmetry_check(robot_positions))
