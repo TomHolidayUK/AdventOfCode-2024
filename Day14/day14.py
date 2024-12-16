@@ -28,6 +28,8 @@ for row in rows:
     robot.append(int(parts[2]))
     robots.append(robot)
 
+print(robots)
+
 # Write a move function that calculates a robots new coordinates after moving (including when they teleport)
 def move(start_x, start_y, vel_x, vel_y):
     new_x, new_y = start_x + vel_x, start_y + vel_y
@@ -62,16 +64,21 @@ print(final_positions)
 
 # Work out which robot is in which quadrant
 q1, q2, q3, q4 = 0, 0, 0, 0
+left_robots, right_robots = [], []
 for position in final_positions:
     x, y = position[0], position[1]
     if x < int((width / 2) - 0.5) and y < int(height / 2 - 0.5):
         q1 += 1
+        left_robots.append([x,y])
     if x >= int(width / 2 + 0.5) and y < int(height / 2 - 0.5):
         q2 += 1
+        right_robots.append([x,y])
     if x >= int(width / 2 + 0.5) and y >= int(height / 2 + 0.5):
         q3 += 1
+        right_robots.append([x,y])
     if x < int(width / 2 - 0.5) and y >= int(height / 2 + 0.5):
         q4 += 1
+        left_robots.append([x,y])
 
 
 print("Part 1 Total = ", q1 * q2 * q3 * q4)
@@ -100,3 +107,43 @@ def print_positions(positions):
     return "Printed positions to positions.txt"
 
 print(print_positions(final_positions))
+
+def symmetry_check(positions):
+    # find left and right robots
+    left_robots, right_robots = [], []
+    for position in positions:
+        x, y = position[0], position[1]
+        if x < int((width / 2) - 0.5) and y < int(height / 2 - 0.5):
+            left_robots.append([x,y])
+        if x >= int(width / 2 + 0.5) and y < int(height / 2 - 0.5):
+            right_robots.append([x,y])
+        if x >= int(width / 2 + 0.5) and y >= int(height / 2 + 0.5):
+            right_robots.append([x,y])
+        if x < int(width / 2 - 0.5) and y >= int(height / 2 + 0.5):
+            left_robots.append([x,y])
+
+    # for every robot in quadrant 1 and 4 there needs to be a matching one in q2 or q3
+    symmetrical = True
+    for robot in left_robots:
+        x, y = robot[0], robot[1]
+        symmetrical_x = (width - 1) - x
+        if [symmetrical_x, y] not in right_robots:
+            symmetrical = False
+
+    return symmetrical
+
+print(symmetry_check(final_positions))
+
+robot_positions = []
+
+should_continue = True
+while(should_continue == True):
+    for robot in robots:
+        print("check")
+        robot_positions = []
+        x, y = move(robot[0], robot[1], robot[2], robot[3])
+        robot_positions.append([x,y])
+        if symmetry_check(robot_positions):
+            should_continue = False
+
+print(print_positions(robot_positions))
