@@ -33,8 +33,15 @@ def next_positions(position, instruction):
     next_x, next_y = x + dx, y + dy
     return [next_x, next_y]
 
-def change_grid(position, new_state):
+def coordinate_to_index(x,y):
+    return (y  * (width + 1)) + x 
+
+def change_grid(grid, position, new_state):
     # we need a function to change the grid 
+    x, y = position[0], position[1]
+    grid[y] = grid[y][:x] + new_state + grid[y][x+1:]
+    return grid
+
 
 def move(grid, instruction):
     # find fish
@@ -66,13 +73,11 @@ def move(grid, instruction):
     # if space 
     if grid[next_y][next_x] == ".":
         print("space so moving")
-        grid[y][x] == "."
-        grid[next_y][next_x] == "@"
+        grid = change_grid(grid, fish, ".")
+        grid = change_grid(grid, [next_x, next_y], "@")
         return grid
 
 
 print(move(grid, "^"))
-matrix[20] = "."
-print(matrix[20])
 
 
