@@ -1,5 +1,3 @@
-import re
-
 data_path = './day14_data.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
