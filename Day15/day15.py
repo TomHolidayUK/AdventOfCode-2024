@@ -13,6 +13,7 @@ with open(data_path, 'r', encoding='utf-8') as file:
 # Split data into grid and intructions
 matrix, instructions = file_content.split('\n\n')
 grid = matrix.split('\n')
+start_grid = grid[:]
 
 # Create a move function that accounts for moving blocks and returns the new grid
 def next_positions(position, instruction):
@@ -87,7 +88,7 @@ for instruction in instructions:
     if (instruction != "\n"):
         grid = move(grid, instruction)
 
-#print(grid)
+print(grid)
 
 # Find sum
 def sum(grid):
@@ -106,4 +107,27 @@ print("Part 1 Result = ", sum(grid))
 #       - find all boxes that will be moved (use DFS???)
 #       - calculate new grid arrangement
 # Run on all instructions and find sum
+
+# Scale up grid
+grid = start_grid
+print(grid)
+
+scaled_grid = []
+
+for line in grid:
+    scaled_line = ""
+    for char in line:
+        if char == "#":
+            scaled_line += "##"
+        if char == ".":
+            scaled_line += ".."
+        if char == "O":
+            scaled_line += "[]"
+        if char == "@":
+            scaled_line += "@."
+    scaled_grid.append(scaled_line)
+
+print(scaled_grid)
+
+
 
