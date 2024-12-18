@@ -1,4 +1,4 @@
-data_path = './day15_data_test.txt'
+data_path = './day15_data_test2.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -15,7 +15,6 @@ matrix, instructions = file_content.split('\n\n')
 grid = matrix.split('\n')
 
 # Create a move function that accounts for moving blocks and returns the new grid
-
 def next_positions(position, instruction):
     x, y = position[0], position[1]
     directions = [(1, 0), (-1, 0), (0, 1), (0, -1)] 
@@ -32,9 +31,6 @@ def next_positions(position, instruction):
     dx, dy = directions[direction][0], directions[direction][1]
     next_x, next_y = x + dx, y + dy
     return [next_x, next_y]
-
-def coordinate_to_index(x,y):
-    return (y  * (width + 1)) + x 
 
 def change_grid(grid, position, new_state):
     # we need a function to change the grid 
@@ -53,31 +49,61 @@ def move(grid, instruction):
 
     # move in direction of instruction
     next_x, next_y = next_positions(fish, instruction)
-    print("next position = ", next_x, next_y)
 
     # if at edge
     if grid[next_y][next_x] == "#":
-        print("at edge, no move")
-        return
-    
+        #print("at edge, no move")
+        return grid
+
     # if wall
-    if grid[next_y][next_x] == "0":
+    if grid[next_y][next_x] == "O":
         # check if it can move
-        while grid[next_y][next_x] == "0":
+        moves = 0 
+        while grid[next_y][next_x] == "O":
             next_x, next_y = next_positions([next_x, next_y], instruction)
+            moves += 1
         if grid[next_y][next_x] == "#":
-            print("walls against the edge, don't move")
+            #print("walls against the edge, don't move")
+            return grid
         if grid[next_y][next_x] == ".":
-            print("need to move walls")
+            #print("need to move wall(s)")
+            # only start and end of wall chain change stat
+            grid = change_grid(grid, fish, ".")
+            grid = change_grid(grid, [next_x, next_y], "O")
+            next_fish = next_positions(fish, instruction)
+            grid = change_grid(grid, next_fish, "@")
+            return grid
 
     # if space 
     if grid[next_y][next_x] == ".":
-        print("space so moving")
+        #print("space so moving")
         grid = change_grid(grid, fish, ".")
         grid = change_grid(grid, [next_x, next_y], "@")
         return grid
 
 
-print(move(grid, "^"))
+# Apply the move function for all instructions
+for instruction in instructions:
+    if (instruction != "\n"):
+        grid = move(grid, instruction)
 
+#print(grid)
+
+# Find sum
+def sum(grid):
+    sum = 0
+    for y, line in enumerate(grid):
+        for x, char in enumerate(line):
+            if char == "O":
+                sum += (100 * y) + x
+    return sum 
+
+print("Part 1 Result = ", sum(grid))
+      
+# Part 2 Plan
+# Scale up grid
+# Update move() to account for changes, need to:
+#       - find all boxes that will be moved (use DFS???)
+#       - calculate new grid arrangement
+# Run on all instructions and find sum
 
