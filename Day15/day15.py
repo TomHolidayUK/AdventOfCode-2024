@@ -88,7 +88,6 @@ for instruction in instructions:
     if (instruction != "\n"):
         grid = move(grid, instruction)
 
-print(grid)
 
 # Find sum
 def sum(grid):
@@ -110,7 +109,6 @@ print("Part 1 Result = ", sum(grid))
 
 # Scale up grid
 grid = start_grid
-print(grid)
 
 scaled_grid = []
 
@@ -127,10 +125,8 @@ for line in grid:
             scaled_line += "@."
     scaled_grid.append(scaled_line)
 
-print(scaled_grid)
 
 rows, cols = len(scaled_grid), len(scaled_grid[0])
-
 
 def move2(scaled_grid, instruction):
     # find fish
@@ -145,23 +141,21 @@ def move2(scaled_grid, instruction):
 
     # if at edge
     if scaled_grid[next_y][next_x] == "#":
-        print("at edge, no move")
+        #print("at edge, no move")
         return scaled_grid
 
     # if wall
     if scaled_grid[next_y][next_x] == "[" or scaled_grid[next_y][next_x] == "]":
-        #print("before", '\n'.join(scaled_grid))
-        #print(instruction)
         # laterally, the same logic as part 1 applies
         if instruction == "<" or instruction == ">":
-            print("lateral wall movement, same as part 1")
+            #print("lateral wall movement, same as part 1")
             while scaled_grid[next_y][next_x] == "[" or scaled_grid[next_y][next_x] == "]":
                 next_x, next_y = next_positions([next_x, next_y], instruction)
             if scaled_grid[next_y][next_x] == "#":
-                print("walls against the edge, don't move")
+                #print("walls against the edge, don't move")
                 return scaled_grid
             if scaled_grid[next_y][next_x] == ".":
-                print("need to move wall(s)")
+                #print("need to move wall(s)")
                 scaled_grid = change_grid(scaled_grid, fish, ".")
                 next_fish = next_positions(fish, instruction)
                 scaled_grid = change_grid(scaled_grid, next_fish, "@")
@@ -181,13 +175,12 @@ def move2(scaled_grid, instruction):
                             scaled_grid = change_grid(scaled_grid, [temp_x, fish[1]], "]")
                         if instruction == "<":
                             scaled_grid = change_grid(scaled_grid, [temp_x, fish[1]], "[")
-                #print("after", '\n'.join(scaled_grid))
                 return scaled_grid
 
 
         group = set()
 
-        print("potentially need to move walls vertically")
+        #print("potentially need to move walls vertically")
         should_continue = True
         gs_x, gs_y = next_x, next_y # group search location
         group.add((gs_x, gs_y, scaled_grid[gs_y][gs_x]))
@@ -196,21 +189,16 @@ def move2(scaled_grid, instruction):
         space = True
         while should_continue == True:
 
-            #print("NEW ROW")
             current_row = []
             # append other halfs of walls to group
             for cell in next_row:
-                #print("check - ", cell)
                 if cell not in current_row:
                     current_row.append(cell)
                     group.add((cell[0], cell[1], scaled_grid[cell[1]][cell[0]]))
-                #print(scaled_grid[cell[1]][cell[0] - 1])
                 if scaled_grid[cell[1]][cell[0]] == "]" and [cell[0] - 1, cell[1]] not in current_row:
-                    #print('adding left')
                     group.add((cell[0] - 1, cell[1], scaled_grid[cell[1]][cell[0] - 1]))
                     current_row.append([cell[0] - 1, cell[1]])
                 if scaled_grid[cell[1]][cell[0]] == "[" and [cell[0] + 1, cell[1]] not in current_row:
-                    #print('adding right')
                     group.add((cell[0] + 1, cell[1], scaled_grid[cell[1]][cell[0] + 1]))
                     current_row.append([cell[0] + 1, cell[1]])
 
@@ -218,27 +206,21 @@ def move2(scaled_grid, instruction):
 
             # once we have all the walls, search upwards on current row
             for cell in current_row:
-                #print("cell: ", cell)
                 if instruction == "^":
                     if (scaled_grid[cell[1] - 1][cell[0]] == "]" or scaled_grid[cell[1] - 1][cell[0]] == "["):
-                        #print("found up")
                         next_row.append([cell[0], cell[1] - 1])
                     if scaled_grid[cell[1] - 1][cell[0]] == "#":
-                        print("can't move walls")
-                        #print("after", '\n'.join(scaled_grid))
+                        #print("can't move walls")
                         return scaled_grid
                 if instruction == "v":
                     if (scaled_grid[cell[1] + 1][cell[0]] == "]" or scaled_grid[cell[1] + 1][cell[0]] == "["):
-                        #print("found down")
                         next_row.append([cell[0], cell[1] + 1])
                     if scaled_grid[cell[1] + 1][cell[0]] == "#":
-                        print("can't move walls")
-                        #print("after", '\n'.join(scaled_grid))
+                        #print("can't move walls")
                         return scaled_grid
 
             if len(next_row) == 0:
-                print("stop")
-                #print("after", '\n'.join(scaled_grid))
+                #print("stop")
                 should_continue = False
                 break
             else:
@@ -248,7 +230,7 @@ def move2(scaled_grid, instruction):
         
         # then check if there is space for them to move
         if len(group) > 0:
-            print("need to move group of ", len(group))
+            #print("need to move group of ", len(group))
             new_group = []
             old_group = []
             for char in group:
@@ -281,7 +263,7 @@ def move2(scaled_grid, instruction):
 
                 return scaled_grid
         else:
-            print("ERROR - can't move group")
+            #print("ERROR - can't move group")
             return scaled_grid
 
             
@@ -289,7 +271,7 @@ def move2(scaled_grid, instruction):
     
     # if space 
     if scaled_grid[next_y][next_x] == ".":
-        print("space so moving")
+        #print("space so moving")
         scaled_grid = change_grid(scaled_grid, fish, ".")
         scaled_grid = change_grid(scaled_grid, [next_x, next_y], "@")
         return scaled_grid
@@ -297,12 +279,9 @@ def move2(scaled_grid, instruction):
 f = 0
 for instruction in instructions:
     if (instruction != "\n"):
-        print(instruction)
         scaled_grid = move2(scaled_grid, instruction)
-        #print(scaled_grid)
-        print('\n'.join(scaled_grid))
         f += 1
 
-print('\n'.join(scaled_grid))
+# print('\n'.join(scaled_grid))
 
 print("Part 2 Result = ", sum(scaled_grid))
