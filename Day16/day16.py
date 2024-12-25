@@ -26,17 +26,14 @@ for y, row in enumerate(grid):
         if column == ".":
             heapq.heappush(heap, (float('inf'), (y, x)))
 
-
-def coordinate_to_index(x,y):
-    return (y  * (width + 1)) + x 
-
 directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+turn = [[False] * cols for _ in range(rows)] 
 
 def dijkstra(grid, start):
 
-    sptSet = set()
-
-    dist = {}
+    dist = {} # distances
+    dirs = {} # directions
     predecessor = {}
 
     for y, row in enumerate(grid):
@@ -53,87 +50,75 @@ def dijkstra(grid, start):
                 dist[(y, x)] = float('inf')
 
 
-    smallest_value, smallest_coordinate = heapq.heappop(heap)
-    print(f"Smallest initial value (the start) is {smallest_value} at coordinate {smallest_coordinate}")
-
     dist[start] = 0
-    print("dist: ", dist)
+    dirs[start] = None
     pq = [(0, start)]
 
-    while pq:
-        current_dist, current_node = heapq.heappop(pq)
-        if current_node not in sptSet:
-            sptSet.add(current_node)
-            print("current node = ", current_node, "dist: ", current_dist)
-            
-            # If the current distance is greater than the recorded distance, skip it
-            if current_dist > dist[current_node]:
-                print("current distance is greater than the recorded distance")
-                continue
-            
-            # Explore neighbors
-            adjacent_vertices = []
-            for dy, dx in directions:
-                new_y, new_x = current_node[0] + dy, current_node[1] + dx
-                if 0 <= new_y < rows and 0 <= new_x < cols:
-                    if current_dist + 1 < dist[(new_y, new_x)] and grid[new_y][new_x] != "#":
-                        print("adding ", new_y, new_x, " to adjacent vertices")
-                        adjacent_vertices.append([new_y, new_x])
-                        heapq.heappush(pq, (current_dist + 1, (new_y, new_x)))
-                        dist[(new_y, new_x)] = current_dist + 1
-            
-            for vertex in adjacent_vertices:
-                distance = current_dist + 1
-                if distance < dist[(new_y, new_x)] and grid[new_y][new_x] != "#":
-                    print("shorter path to neighbour found for ", new_y, new_x)
-                    dist[(new_y, new_x)] = distance
-                    predecessor[(new_y, new_x)] = current_node
-                    heapq.heappush(pq, (distance, (new_y, new_x)))
-        else:
-            print("already visited this square")
+    def add_node(current_distance, new, value):
+        if current_distance + value <= dist[(new[0], new[1])]:
+            dist[(new[0], new[1])] = current_distance + value
+            heapq.heappush(pq, (current_distance + value, (new[0], new[1])))
 
+    current_node = start
+
+    while current_node != end:
+        current_dist, current_node = heapq.heappop(pq)
+        if current_node == end:
+            break
+        
+        # If the current distance is greater than the recorded distance, skip it
+        if current_dist > dist[current_node]:
+            continue
+        
+        # Explore neighbors
+        adjacent_vertices = []
+        for dy, dx in directions:
+            new_y, new_x = current_node[0] + dy, current_node[1] + dx
+            if 0 <= new_y < rows and 0 <= new_x < cols:
+                if current_dist + 1 < dist[(new_y, new_x)] and grid[new_y][new_x] != "#":
+                    adjacent_vertices.append([new_y, new_x])
+
+                    # account for the points increase associated with turning
+                    dirs[(new_y, new_x)] = (dy, dx)
+                    if (current_node[0], current_node[1]) != start:
+                        if dirs[(current_node[0], current_node[1])] != dirs[(new_y, new_x)]:
+                            turn[current_node[0]][current_node[1]] = True
+                            add_node(current_dist, (new_y, new_x), 1001)
+                        else:
+                            add_node(current_dist, (new_y, new_x), 1)
+                    else:
+                        if (dy, dx) != (0, 1):
+                            add_node(current_dist, (new_y, new_x), 1001)
+                        else:
+                            add_node(current_dist, (new_y, new_x), 1)
+            
 
     return dist, predecessor
         
 
 distances, predecessors = dijkstra(grid, start)
-filtered_data = {key: val for key, val in distances.items() if val != float('inf')}
-#print(f"Shortest distances from node {start}: {filtered_data}")
-
-grid_print = []
-
-for y in range(rows):
-    string = ""
-    for x in range(cols):
-        if grid[y][x] == "#":
-            string += "#"
-        else: 
-            length = len(str(filtered_data[(y, x)]))
-            string += str(filtered_data[(y, x)])[length - 1]
-
-    grid_print.append(string)
-
-print('\n'.join(grid_print))
+path_data = {key: val for key, val in distances.items() if val != float('inf')}
 
 # find shortest path to end
 current_position = end
-current_value = int(filtered_data[(end[0], end[1])])
-shortest_path = [end]
+current_value = int(path_data[(end[0], end[1])])
+shortest_path = set(end)
 while current_position != start:
-    print(current_position, current_value)
     for dy, dx in directions:
         new_y, new_x = current_position[0] + dy, current_position[1] + dx
-        if grid[new_y][new_x] != "#" and int(filtered_data[(new_y,new_x)]) == current_value - 1:
-            print(new_y, new_x, " is ", int(filtered_data[(new_y,new_x)]))
-            if int(filtered_data[(new_y,new_x)]) == current_value - 1:
+        if grid[new_y][new_x] != "#" and (int(path_data[(new_y,new_x)]) == current_value - 1 or int(path_data[(new_y,new_x)]) == current_value - 1001):
+            if int(path_data[(new_y,new_x)]) == current_value - 1:
                 current_position = new_y, new_x
                 current_value -= 1
-                shortest_path.append(current_position)
+                shortest_path.add(current_position)
+            if int(path_data[(new_y,new_x)]) == current_value - 1001:
+                current_position = new_y, new_x
+                current_value -= 1001
+                shortest_path.add(current_position)
 
-print(shortest_path)
 
+# print grid
 grid_print = []
-
 for y in range(rows):
     string = ""
     for x in range(cols):
@@ -143,12 +128,57 @@ for y in range(rows):
             string += "X"
         if grid[y][x] == "." and (y,x) not in shortest_path: 
             string += "."
+        if (y,x) == start: 
+            string += "S"
+        if (y,x) == end: 
+            string += "E"
 
     grid_print.append(string)
 
-
-
 print('\n'.join(grid_print))
 
+print("Part 1 Solution: ", int(path_data[end]))
+
+shortest_paths = set()
+
+def dfs(grid, y, x, visited):
+        global spots
+        current_value = int(path_data[(y,x)])
+        
+        if (y, x) == start:            
+            shortest_paths.add((y, x))
+        
+        for dy, dx in directions:
+            new_y, new_x = y + dy, x + dx
+            if (new_y, new_x) in path_data:
+                if 0 <= new_y < rows and 0 <= new_x < cols and grid[new_y][new_x] != "#" and not visited[new_y][new_x] and (int(path_data[(new_y,new_x)]) == current_value - 1 or int(path_data[(new_y,new_x)]) == current_value - 1001 or (int(path_data[(new_y,new_x)]) == current_value + 999) and turn[y][x] == True):
+                    shortest_paths.add((new_y,new_x))
+                    visited[new_y][new_x] = True
+                    dfs(grid, new_y, new_x, visited) # Recurse to continue exploring
+                    visited[new_y][new_x] = False
 
 
+
+visited = [[False] * cols for _ in range(rows)] 
+visited[0][0] = True  
+dfs(grid, end[0], end[1], visited)
+
+shortest_paths.add(end)
+
+
+grid_print2 = []
+for y in range(rows):
+    string = ""
+    for x in range(cols):
+        if grid[y][x] == "#":
+            string += "#"
+        if (y,x) in shortest_paths: 
+            string += "X"
+        if grid[y][x] == "." and (y,x) not in shortest_paths: 
+            string += "."
+
+    grid_print2.append(string)
+
+print('\n'.join(grid_print2))
+
+print("Part 2 Solution: ", len(shortest_paths))
