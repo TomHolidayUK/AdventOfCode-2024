@@ -1,4 +1,4 @@
-data_path = './day19_data_test.txt'
+data_path = './day19_data.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -19,82 +19,62 @@ print(desired_ptrns)
 
 counter = 0
 
-for ptrn in desired_ptrns:
-    size = len(ptrn)
+def is_pattern_possible(pattern):
+    size = len(pattern)
 
     is_possible = True
 
     # we will use pointers to move through the disered pattern and compare to available patterns
     pos = 0
-    combo = 0
 
     while pos < size:
-        #ptrn_array = list(ptrn)
-        char = (ptrn[pos])
+        char = (pattern[pos])
 
         if char in available_ptrns:
-            print(char, "available")
+            #print(char, "available")
             pos += 1
         else:
-            print(char, "UNavailable")
-            should_continue = True
-            while should_continue:
+            #print(char, "UNavailable")
 
-                if combo + pos > size:
-                    print("at end")
-                    is_possible = False
-                    pos = size + 1
-                    break
+            is_possible = False
+            
+            left = pos
+            right = size - pos - 1
 
-                combo += 1
-                start = pos
-                end = start + combo
-                chars = ptrn[start:end]
-                if chars in available_ptrns:
-                    print(chars, "available")
-                    should_continue = False
-                    pos = end
+            for i in range(left + 1):
+                for j in range(right + 1):
+                    chars = pattern[pos - i : pos + j + 1]
+                    #print(chars)
+                    if chars in available_ptrns:
+                        #print(chars, "available")
+                        is_possible = True
+                        # pos = pos + j + 1
+                        pos += 1
+                        break
+
+            if is_possible == False:
+                #print("no possible combination to get", char)
+                break
+
 
     if is_possible:
-        counter += 1
-        print(ptrn, "is possible")
+        print(pattern, "is possible")
+        return True
     else:
-        print(ptrn, "is not possible")
+        print(pattern, "is not possible")
+        return False
 
 
-ptrn = desired_ptrns[5]
+# is_pattern_possible(desired_ptrns[4])
 
-# size = len(ptrn)
 
-# # we will use pointers to move through the disered pattern and compare to available patterns
-# pos = 0
-# combo = 0
+for ptrn in desired_ptrns:
+    if is_pattern_possible(ptrn):
+        counter += 1
 
-# while pos < size:
-#     #ptrn_array = list(ptrn)
-#     char = (ptrn[pos])
-
-#     if char in available_ptrns:
-#         print(char, "available")
-#         pos += 1
-#     else:
-#         print(char, "UNavailable")
-#         should_continue = True
-#         while should_continue:
-
-#             if combo + pos > size:
-#                 print("at end")
-#                 pos = size + 1
-#                 break
-
-#             combo += 1
-#             start = pos
-#             end = start + combo
-#             chars = ptrn[start:end]
-#             if chars in available_ptrns:
-#                 print(chars, "available")
-#                 should_continue = False
-#                 pos = end
 
 
 print("Part 1 Solution = ", counter)
+
+
+# 338 - too high
