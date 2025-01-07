@@ -155,3 +155,24 @@ print(is_pattern_possible2("uuwwwrgrbgrwrwgruuurbwbggwwgbbrwbbuwrrrwrgrgbbwbubrg
 
 # uuwwwrgrbgrwrwgruuurbwbggwwgbbrwbbuwrrrwrgrgbbwbubrgrrg
 # ugwwbbwwruguwbbuurbggubwwbrurrrubbwwgbbrrrwbgugwbwuubrggrg
+
+input = "uuwwwrgrbgrwrwgruuurbwbggwwgbbrwbbuwrrrwrgrgbbwbubrgrrg"
+empty_line = len(input) * "_"
+
+array = [input, empty_line, empty_line]
+
+print(array)
+
+def print(array):
+    with open("./test.txt", "w") as file:
+        # loop through all possible positions and see if there are robots there
+        for thing in array:
+            width = len(thing)
+            for i, char in enumerate(thing):
+                file.write(f"{char}")
+                if i == width - 1:
+                    file.write("\n")
+    
+    return "Printed positions to test.txt"
+
+print(array)
