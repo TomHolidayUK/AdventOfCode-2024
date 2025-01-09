@@ -8,3 +8,7 @@ Day 10 - DFS
 Day 11 - DFS with memoisation (dynamic programming)
 Day 12 - bit of DFS again (well connect the components algorithm to be more precise)
 Day 13 - basic linear equations
+Day 16 - Dijkstra's
+Day 17 Pt 2 - Reverse engineering (i got stuck on this and had to see online solutions)
+Day 18 - Dijkstra's
+Day 19 - I got stuck here -  had to see online solution (dynamic programming)
