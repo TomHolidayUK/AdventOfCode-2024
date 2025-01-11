@@ -1,4 +1,4 @@
-data_path = './day20_data_test.txt'
+data_path = './day20_data.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -90,17 +90,16 @@ path_data = {key: val for key, val in distances.items() if val != float('inf')}
 
 current_position = end
 current_value = int(path_data[(end[0], end[1])])
-shortest_path = set()
-shortest_path.add(current_position)
-print(shortest_path)
+shortest_path = []
+shortest_path.append(current_position)
 while current_position != start:
     for dy, dx in directions:
         new_y, new_x = current_position[0] + dy, current_position[1] + dx
-        if new_y >= 0 and new_y <= cols and new_x >= 0 and new_x <= rows:
+        if new_y >= 0 and new_y <= rows and new_x >= 0 and new_x <= cols:
             if data[new_y][new_x] != "#" and int(path_data[(new_y,new_x)]) == current_value - 1:
                 current_position = new_y, new_x
                 current_value -= 1
-                shortest_path.add(current_position)
+                shortest_path.append(current_position)
 
 
 # print data
@@ -123,27 +122,27 @@ for y in range(rows):
 
     data_print.append(string)
 
-print('\n'.join(data_print))
+#print('\n'.join(data_print))
 
 print("Fastest time: ", int(path_data[end]))
 
-print(shortest_path)
+#print(shortest_path)
 
 # now we want to go through the shortest path and find possible cheats
 # we need a function to work out how much time a cheat would save
 
-
-possible_cheat_locations = set()
+cheat_locations = []
 for location in shortest_path:
     for dy, dx in directions:
         new_y, new_x = location[0] + dy, location[1] + dx
         new2_y, new2_x = location[0] + (2 * dy), location[1] + (2 * dx)
-        if new_y >= 0 and new_y <= cols and new_x >= 0 and new_x <= rows and new2_y >= 0 and new2_y <= cols and new2_x >= 0 and new2_x <= rows:
-            if data[new_y][new_x] == "#" and (new2_y, new2_x) in shortest_path:
-                print("cheat location at: ", new_y, new_x)
-                possible_cheat_locations.add((new_y, new_x))
+        if new_y >= 0 and new_y <= rows and new_x >= 0 and new_x <= cols and new2_y >= 0 and new2_y <= rows and new2_x >= 0 and new2_x <= cols:
+            if data[new_y][new_x] == "#" and (new2_y, new2_x) in shortest_path and (new_y, new_x) not in cheat_locations:
+                cheat_locations.append((new_y, new_x))
 
-print(possible_cheat_locations)
+
+#print(cheat_locations)
+
 
 # print data
 data_print = []
@@ -156,7 +155,7 @@ for y in range(rows):
         if (y,x) == end: 
             string += "E"
             continue
-        if (y,x) in possible_cheat_locations:
+        if (y,x) in cheat_locations:
             string += "@"
             continue
         if data[y][x] == "#":
@@ -168,4 +167,47 @@ for y in range(rows):
 
     data_print.append(string)
 
-print('\n'.join(data_print))
+#print('\n'.join(data_print))
+
+def time_saved(cheat_location):
+    #print(cheat_location)
+    # first find the two path locations either side of the cheat location
+    locations = []
+    for dy, dx in directions:
+        # opposing direcitons
+        new_y, new_x = cheat_location[0] + dy, cheat_location[1] + dx
+        new2_y, new2_x = cheat_location[0] - dy, cheat_location[1] - dx
+        if (new_y, new_x) in shortest_path and (new2_y, new2_x) in shortest_path:
+            #print((new_y, new_x), "and", (new2_y, new2_x), " in shortest path")
+            locations.append((new_y, new_x))
+            locations.append((new2_y, new2_x))
+            break
+
+    if len(locations) != 2:
+        print("ERROR")
+        return -1
+
+    return abs(shortest_path.index(locations[0]) - shortest_path.index(locations[1])) - 2
+
+
+total = 0
+
+frequencies = {}
+
+for location in cheat_locations:
+    saving = time_saved(location)
+    if saving in frequencies:
+        frequencies[saving] += 1
+    else:
+        frequencies[saving] = 1
+
+    if time_saved(location) >= 100:
+        total += 1
+
+
+print("Test data frequencies: ", frequencies)
+print("Part 1 Solution = ", total)
+
+# Part 2
+# for every location in shortest_path, work out which other locations in the path we can get to in less than 20 ps
+# work out time saving 
