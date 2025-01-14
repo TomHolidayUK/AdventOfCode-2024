@@ -12,3 +12,9 @@ Day 16 - Dijkstra's
 Day 17 Pt 2 - Reverse engineering (i got stuck on this and had to see online solutions)
 Day 18 - Dijkstra's
 Day 19 - I got stuck here -  had to see online solution (dynamic programming)
+
+
+
+Where I got stuck:
+Day 17 pt 2
+Day 19

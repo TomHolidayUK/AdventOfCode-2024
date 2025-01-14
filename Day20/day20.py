@@ -217,19 +217,112 @@ def time_saved2(start, end):
     print(end)
     return shortest_path.index(start) - shortest_path.index(end) - abs(start[0] - end[0]) - abs(start[1] - end[1])
 
-def cheat_locations2(location):
-    print(location)
-    cheat_locations = []
-    # find all locations that are within 20 picoseconds and that are more advanced in the path than the current location
-    index = shortest_path.index(location)
-    for option in shortest_path:
-        option_index = shortest_path.index(option)
-        if (abs(location[0] - option[0]) + abs(location[1] - option[1])) <= 20 and index > option_index:
-            print("cheat location at: ", option)
-            cheat_locations.append(option)
+start = shortest_path[-1]
+heap = [] 
 
-    return cheat_locations
+for y, row in enumerate(data):
+    for x, column in enumerate(row):
+        if column == "#":
+            heapq.heappush(heap, (float('inf'), (y, x)))
 
-tests = cheat_locations2(shortest_path[-1])
-for test in tests:
-    print(time_saved2(shortest_path[-1], test))
+heapq.heappush(heap, (0, (3, 1))) # start
+
+def dijkstra2(data, start):
+
+    # define dictionaries for distances ans predecessors
+    dist = {} 
+    predecessor = {}
+
+    for y, row in enumerate(data):
+        for x, column in enumerate(row):
+            predecessor[(y, x)] = None
+            if (y,x) != start:
+                dist[(y, x)] = float('inf')
+
+
+    dist[start] = 0
+    pq = [(0, start)]
+
+    # add node if there is a shorter distances to that node than currently exists 
+    def add_node(current_distance, new):
+        if current_distance + 1 <= dist[(new[0], new[1])]:
+            dist[(new[0], new[1])] = current_distance + 1
+            heapq.heappush(pq, (current_distance + 1, (new[0], new[1])))
+
+    current_node = start
+
+    # loop until at the end or until no more possible paths
+    should_continue = True
+    while should_continue:
+        if len(pq) == 0:
+            print("processed all nodes - no possible path")
+            break
+
+        current_dist, current_node = heapq.heappop(pq)
+
+        # If the current distance is greater than the recorded distance, skip it
+        if current_dist > dist[current_node]:
+            print("current distance is greater than the recorded distance")
+            continue
+        
+        # Explore neighbors
+        adjacent_vertices = []
+        for dy, dx in directions:
+            new_y, new_x = current_node[0] + dy, current_node[1] + dx
+            if 0 <= new_y < rows and 0 <= new_x < cols:
+                if current_dist + 1 < dist[(new_y, new_x)] and data[new_y][new_x] == "#" and current_dist < 19:
+                    adjacent_vertices.append([new_y, new_x])
+                    add_node(current_dist, (new_y, new_x))
+            
+
+    return dist, predecessor
+        
+
+distances, predecessors = dijkstra2(data, start)
+
+# find possible cheats by going through the shortest path and seeing if there are any of the dijkstra locations nearby
+location_data = {key: val for key, val in distances.items() if val != float('inf')}
+
+def best_cheat(best, new):
+    if best == 0 and new != 0:
+        return new
+    if best != 0 and new < best:
+        return new
+    return best
+
+cheat_prints = {}
+
+for location in shortest_path:
+    #print("location: ", location)
+    best_cheat_val = 0
+    for dy, dx in directions:
+        new_y, new_x = location[0] + dy, location[1] + dx
+        if (new_y, new_x) in location_data:
+            #print("possible cheat from: ", new_y, new_x, location_data[(new_y, new_x)])
+            best_cheat_val = best_cheat(best_cheat_val, location_data[(new_y, new_x)] + 1)
+
+    if best_cheat_val != 0:
+        print("cheat of ", best_cheat_val, "at", location)
+        cheat_prints[location] = best_cheat_val
+
+
+
+# print data
+data_print = []
+for y in range(rows):
+    string = ""
+    for x in range(cols):
+        if (y,x) == start: 
+            string += "S"
+            continue
+        if (y,x) in cheat_prints:
+            string += str(cheat_prints[(y, x)])[-1]
+            continue
+        if data[y][x] == "#":
+            string += "#"
+        if data[y][x] == ".": 
+            string += "."
+
+    data_print.append(string)
+
+print('\n'.join(data_print))
