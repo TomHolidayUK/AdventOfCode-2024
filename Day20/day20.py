@@ -1,4 +1,4 @@
-data_path = './day20_data.txt'
+data_path = './day20_data_test.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -126,7 +126,7 @@ for y in range(rows):
 
 print("Fastest time: ", int(path_data[end]))
 
-#print(shortest_path)
+print(shortest_path)
 
 # now we want to go through the shortest path and find possible cheats
 # we need a function to work out how much time a cheat would save
@@ -211,3 +211,25 @@ print("Part 1 Solution = ", total)
 # Part 2
 # for every location in shortest_path, work out which other locations in the path we can get to in less than 20 ps
 # work out time saving 
+
+
+def time_saved2(start, end):
+    print(end)
+    return shortest_path.index(start) - shortest_path.index(end) - abs(start[0] - end[0]) - abs(start[1] - end[1])
+
+def cheat_locations2(location):
+    print(location)
+    cheat_locations = []
+    # find all locations that are within 20 picoseconds and that are more advanced in the path than the current location
+    index = shortest_path.index(location)
+    for option in shortest_path:
+        option_index = shortest_path.index(option)
+        if (abs(location[0] - option[0]) + abs(location[1] - option[1])) <= 20 and index > option_index:
+            print("cheat location at: ", option)
+            cheat_locations.append(option)
+
+    return cheat_locations
+
+tests = cheat_locations2(shortest_path[-1])
+for test in tests:
+    print(time_saved2(shortest_path[-1], test))
