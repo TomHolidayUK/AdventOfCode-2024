@@ -214,7 +214,6 @@ print("Part 1 Solution = ", total)
 
 
 def time_saved2(start, end):
-    print(end)
     return shortest_path.index(start) - shortest_path.index(end) - abs(start[0] - end[0]) - abs(start[1] - end[1])
 
 start = shortest_path[-1]
@@ -291,9 +290,12 @@ def best_cheat(best, new):
     return best
 
 cheat_prints = {}
+all_cheat_record = {}
 
 for location in shortest_path:
     #print("location: ", location)
+    if location == start:
+        continue
     best_cheat_val = 0
     for dy, dx in directions:
         new_y, new_x = location[0] + dy, location[1] + dx
@@ -302,7 +304,12 @@ for location in shortest_path:
             best_cheat_val = best_cheat(best_cheat_val, location_data[(new_y, new_x)] + 1)
 
     if best_cheat_val != 0:
-        print("cheat of ", best_cheat_val, "at", location)
+        time_saved = time_saved2(start, location)
+        print("cheat of ", best_cheat_val, "at", location, "saves", time_saved)
+        if time_saved in all_cheat_record:
+            all_cheat_record[time_saved] = all_cheat_record[time_saved] + 1
+        else:
+            all_cheat_record[time_saved] = 1
         cheat_prints[location] = best_cheat_val
 
 
@@ -327,5 +334,4 @@ for y in range(rows):
 
 print('\n'.join(data_print))
 
-
-#test
+print(all_cheat_record)
