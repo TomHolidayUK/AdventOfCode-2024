@@ -1,4 +1,4 @@
-data_path = './day20_data_test.txt'
+data_path = './day20_data.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -126,7 +126,7 @@ for y in range(rows):
 
 print("Fastest time: ", int(path_data[end]))
 
-print(shortest_path)
+print(len(shortest_path))
 
 # now we want to go through the shortest path and find possible cheats
 # we need a function to work out how much time a cheat would save
@@ -216,122 +216,36 @@ print("Part 1 Solution = ", total)
 def time_saved2(start, end):
     return shortest_path.index(start) - shortest_path.index(end) - abs(start[0] - end[0]) - abs(start[1] - end[1])
 
-start = shortest_path[-1]
-heap = [] 
-
-for y, row in enumerate(data):
-    for x, column in enumerate(row):
-        if column == "#":
-            heapq.heappush(heap, (float('inf'), (y, x)))
-
-heapq.heappush(heap, (0, (3, 1))) # start
-
-def dijkstra2(data, start):
-
-    # define dictionaries for distances ans predecessors
-    dist = {} 
-    predecessor = {}
-
-    for y, row in enumerate(data):
-        for x, column in enumerate(row):
-            predecessor[(y, x)] = None
-            if (y,x) != start:
-                dist[(y, x)] = float('inf')
-
-
-    dist[start] = 0
-    pq = [(0, start)]
-
-    # add node if there is a shorter distances to that node than currently exists 
-    def add_node(current_distance, new):
-        if current_distance + 1 <= dist[(new[0], new[1])]:
-            dist[(new[0], new[1])] = current_distance + 1
-            heapq.heappush(pq, (current_distance + 1, (new[0], new[1])))
-
-    current_node = start
-
-    # loop until at the end or until no more possible paths
-    should_continue = True
-    while should_continue:
-        if len(pq) == 0:
-            print("processed all nodes - no possible path")
-            break
-
-        current_dist, current_node = heapq.heappop(pq)
-
-        # If the current distance is greater than the recorded distance, skip it
-        if current_dist > dist[current_node]:
-            print("current distance is greater than the recorded distance")
-            continue
-        
-        # Explore neighbors
-        adjacent_vertices = []
-        for dy, dx in directions:
-            new_y, new_x = current_node[0] + dy, current_node[1] + dx
-            if 0 <= new_y < rows and 0 <= new_x < cols:
-                if current_dist + 1 < dist[(new_y, new_x)] and data[new_y][new_x] == "#" and current_dist < 19:
-                    adjacent_vertices.append([new_y, new_x])
-                    add_node(current_dist, (new_y, new_x))
-            
-
-    return dist, predecessor
-        
-
-distances, predecessors = dijkstra2(data, start)
-
-# find possible cheats by going through the shortest path and seeing if there are any of the dijkstra locations nearby
-location_data = {key: val for key, val in distances.items() if val != float('inf')}
-
-def best_cheat(best, new):
-    if best == 0 and new != 0:
-        return new
-    if best != 0 and new < best:
-        return new
-    return best
-
-cheat_prints = {}
 all_cheat_record = {}
 
-for location in shortest_path:
-    #print("location: ", location)
-    if location == start:
-        continue
-    best_cheat_val = 0
-    for dy, dx in directions:
-        new_y, new_x = location[0] + dy, location[1] + dx
-        if (new_y, new_x) in location_data:
-            #print("possible cheat from: ", new_y, new_x, location_data[(new_y, new_x)])
-            best_cheat_val = best_cheat(best_cheat_val, location_data[(new_y, new_x)] + 1)
+def within_radius(radius, location1, location2):
+    if abs(location1[0] - location2[0]) + abs(location1[1] - location2[1]) <= radius:
+        return True
+    else:
+        return False
 
-    if best_cheat_val != 0:
-        time_saved = time_saved2(start, location)
-        print("cheat of ", best_cheat_val, "at", location, "saves", time_saved)
-        if time_saved in all_cheat_record:
-            all_cheat_record[time_saved] = all_cheat_record[time_saved] + 1
-        else:
-            all_cheat_record[time_saved] = 1
-        cheat_prints[location] = best_cheat_val
+threshold = 100
+pt2_total = 0 
+
+def find_cheats(start_location):
+    global pt2_total
+    for location in shortest_path:
+        if location != start_location and shortest_path.index(start_location) > shortest_path.index(location) and within_radius(20, start_location, location):
+            time_saving = time_saved2(start_location, location)
+            #print(location, time_saving)
+            if time_saving >= threshold:
+                pt2_total += 1
+            if time_saving in all_cheat_record:
+                all_cheat_record[time_saving] = all_cheat_record[time_saving] + 1
+            else:
+                all_cheat_record[time_saving] = 1
 
 
+for i, location in enumerate(shortest_path):
+    print("progress: ", i / len(shortest_path) * 100)
+    find_cheats(location)
 
-# print data
-data_print = []
-for y in range(rows):
-    string = ""
-    for x in range(cols):
-        if (y,x) == start: 
-            string += "S"
-            continue
-        if (y,x) in cheat_prints:
-            string += str(cheat_prints[(y, x)])[-1]
-            continue
-        if data[y][x] == "#":
-            string += "#"
-        if data[y][x] == ".": 
-            string += "."
-
-    data_print.append(string)
-
-print('\n'.join(data_print))
 
 print(all_cheat_record)
+
+print("Part 2 Solution = ", pt2_total)
