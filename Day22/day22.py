@@ -43,7 +43,7 @@ def find_nth_secret(n, secret):
 total_1 = 0
 part2_lists = []
 
-for val in test_data:
+for val in data:
     secret, buyer_list = find_nth_secret(2000, int(val))
     total_1 += secret
     part2_lists.append(buyer_list)
@@ -88,3 +88,6 @@ for sequence, value in highest_value_map.items():
 
 print(highest_sequence, highest_value)
 print("Part 2 Solution = ", highest_value)
+
+
+1768 # too low
