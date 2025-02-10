@@ -1,4 +1,4 @@
-data_path = './day24_data_test.txt'
+data_path = './day24_data.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -68,19 +68,37 @@ def process(values):
     if func == "AND":
         return map[val1] & map[val2]
     if func == "XOR":
-        return map[val1] != map[val2]
+        if map[val1] != map[val2]:
+            return 1
+        else:
+            return 0
     if func == "OR":
-        return map[val1] ^ map[val2]
+        if map[val1] == 1 or map[val2] == 1:
+            return 1
+        else:
+            return 0
+    
+print(map)
 
-# while "" in final_wires:
-for gate in all_gates_good:
-    if map[gate[0]] and map[gate[2]]:
-        print(gate[3], process(gate))
-        map[gate[3]] = process(gate)
+while "" in final_wires:
+    for gate in all_gates_good:
+        if map[gate[0]] != "" and map[gate[2]] != "":
+            print(gate[0], gate[2], gate[3], process(gate))
+            map[gate[3]] = process(gate)
+            if gate[3][0] == "z":
+                print("found z: ", int(gate[3][1:3]))
+                final_wires[int(gate[3][1:3])] = process(gate)
 
+    print("------")
 
+print(map)
+print(final_wires)
 
-# print(final_wires)
+binary_number = ""
+for i in range(max_z, -1, -1):
+    binary_number += str(final_wires[i])
+
+print("Part 1 result: ", int(binary_number, 2))
     
 
 

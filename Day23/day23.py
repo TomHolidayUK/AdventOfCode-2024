@@ -31,14 +31,11 @@ def find_matches(a, b):
 for line in data:
     a,b = line.split("-")
     matches = find_matches(node_conns[a], node_conns[b])
+    print(a,b,matches)
     for match in matches:
         # to avoid repetition sort
         sorted_conns = sorted([a,b,match])
-        print(sorted_conns)
         lan_parties.add(tuple(sorted_conns))
-
-# print(lan_parties)
-# print(len(lan_parties))
 
 part1_total = 0 
 
@@ -46,5 +43,7 @@ for party in lan_parties:
     if party[0][0] == "t" or party[1][0] == "t" or party[2][0] == "t":
         part1_total += 1
 
-
 print("Part 1 Solution: ", part1_total)
+
+
+# part 2 plan - find biggest party
