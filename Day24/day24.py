@@ -1,4 +1,4 @@
-data_path = './day24_data.txt'
+data_path = './day24_data_test2.txt'
 
 with open(data_path, 'r', encoding='utf-8') as file:
     file_content = file.read()
@@ -99,6 +99,31 @@ for i in range(max_z, -1, -1):
     binary_number += str(final_wires[i])
 
 print("Part 1 result: ", int(binary_number, 2))
-    
+
+x_binary = ""
+y_binary = ""
+
+for wire in all_wires:
+    key = wire[:3]
+    val = wire[5]
+    if key[0] == "x":
+        x_binary += val
+    if key[0] == "y":
+        y_binary += val
+
+x_binary_reversed = ""
+y_binary_reversed = ""
+for i in range(len(x_binary) - 1, -1, -1):
+    x_binary_reversed += x_binary[i]
+    y_binary_reversed += y_binary[i]
+
+print(x_binary_reversed)
+x_val = int(x_binary_reversed, 2)
+print(x_val)
+print(y_binary_reversed)
+y_val = int(y_binary_reversed, 2)
+print(y_val)
+
+print("need to get: ", x_val + y_val)
 
 
